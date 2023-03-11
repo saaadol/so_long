@@ -1,31 +1,7 @@
 #include "get_next_line.h"
 #include <mlx.h>
+#include "so_long.h"
 
-typedef struct t_list
-{
-	char **array; 
-	int coin;
-	int player_x;
-	int player_y;
-	int rows;
-	int columns;
-	void *mlx;
-	void *img;
-	void *img_wall;
-	void *img_floor;
-	void *img_soil;
-	void *img_castle;
-	void *img_water;
-	void *img_enemy;
-	void *img_tree;
-	void *img_sky;
-	void *mlx_win;
-	int img_width;
-	int img_height;
-	int position_x;
-	int position_y;
-	char *img_path;
-} t_list;
 char	*ft_join(char *s1, char *s2)
 {
 	size_t	i;
@@ -327,6 +303,7 @@ void checking_first_wall(char *buffer)
 		i++;
 	}
 }
+
 void checking_last_wall(char *buffer)
 {
 	int i = 0;
@@ -370,80 +347,117 @@ void checking_size_map(char **array, t_list list)
 		i++;
 	}
 }
-void displaying_img(t_list list)
+int moving_player(int keycode, t_list *list)
 {
-	// printf("%d \n",list.columns);
-	int i = 0;
-	int j = 0;
-	int x = 0;
-	int y = 0;
-	list.position_y= 0;
-	list.position_x=0;
-	list.mlx = mlx_init();
-	list.img_path = "player2_.xpm";
-	list.mlx_win = mlx_new_window(list.mlx, ((list.columns) * 64), ((list.rows+1)* 64), "New window");
-	list.img = mlx_xpm_file_to_image(list.mlx, list.img_path, &list.img_width, &list.img_height);
-	list.img_wall = mlx_xpm_file_to_image(list.mlx, "wall.xpm", &list.img_width, &list.img_height);
-	list.img_tree = mlx_xpm_file_to_image(list.mlx, "trees.xpm", &list.img_width, &list.img_height);
-	list.img_sky = mlx_xpm_file_to_image(list.mlx, "sky.xpm", &list.img_width, &list.img_height);
-	list.img_floor = mlx_xpm_file_to_image(list.mlx, "floor.xpm", &list.img_width, &list.img_height);
-	list.img_soil = mlx_xpm_file_to_image(list.mlx, "soil.xpm", &list.img_width, &list.img_height);
-	list.img_castle = mlx_xpm_file_to_image(list.mlx, "castle.xpm", &list.img_width, &list.img_height);
-	list.img_water = mlx_xpm_file_to_image(list.mlx, "water.xpm", &list.img_width, &list.img_height);
-	list.img_enemy = mlx_xpm_file_to_image(list.mlx, "enemy.xpm", &list.img_width, &list.img_height);
-	//mlx_put_image_to_window(list.mlx, list.mlx_win, list.img, list.img_width, list.img_height);
-	// while (list.array[i])
-	// {
-	// 	printf("%s\n", list.array[i++]);
-	// }
-	
-	while (list.array[list.position_x])
+	int counter = 0;
+	if (keycode == 13 || keycode == 126)
 	{
-		list.position_y = 0;
-		while (list.array[list.position_x][list.position_y])
-		{
-			if (list.array[list.position_x][list.position_y] == '1')
-			{
-				if (list.position_x == 0)
-					mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_sky, list.position_y*64, list.position_x*64);
-				else if (list.position_x == list.rows)
-					mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_soil, list.position_y*64, list.position_x*64);
-				else
-				{
-					mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_floor, list.position_y*64, list.position_x*64);
-					mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_tree, list.position_y*64, list.position_x*64);
-				}
-			}
-			else if (list.array[list.position_x][list.position_y] == '0')
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_floor, list.position_y*64, list.position_x*64);
-			else if (list.array[list.position_x][list.position_y] == 'P')
-			{
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_floor, list.position_y*64, list.position_x*64);
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img, list.position_y*64, list.position_x*64);
-			}
-			else if (list.array[list.position_x][list.position_y] == 'E')
-			{
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_floor, list.position_y*64, list.position_x*64);
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_castle, list.position_y*64, list.position_x*64);
-			}
-			else if (list.array[list.position_x][list.position_y] == 'C')
-			{
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_floor, list.position_y*64, list.position_x*64);
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_water, list.position_y*64, list.position_x*64);
-			}
-			else if (list.array[list.position_x][list.position_y] == 'N')
-			{
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_floor, list.position_y*64, list.position_x*64);
-				mlx_put_image_to_window(list.mlx, list.mlx_win, list.img_enemy, list.position_y*64, list.position_x*64);
-			}
-			else if (list.array[list.position_x][list.position_y] == '\n')
-				break;
-			list.position_y++;
-		}
-		list.position_x++;
+		int fd = open("moves1", O_CREAT | O_TRUNC| O_WRONLY, 0777);
+		dup2(fd, 1);
+		//printf("hello");
+		move_up(list, &counter);
 	}
-	mlx_loop(list.mlx);
+	else if (keycode == 1 || keycode == 125)
+		move_down(list, &counter);
+	else if (keycode == 0 || keycode == 123)
+		move_left(list, &counter);
+	else if (keycode == 2 || keycode == 124)
+		move_right(list, &counter);
+	else if (keycode == 53)
+	{
+		mlx_destroy_window(list->mlx,list->mlx_win)	;
+		exit(1);
+	}
+
+	return(counter);
 }
+
+void move_up(t_list *list,int *counter)
+{
+	list ->position_x = 0;
+	list ->position_y = 0;
+	void *tmp;
+	locating_Start_point(list->array, &list->position_x, &list->position_y);
+	if (list->array[list->position_x - 1][list->position_y] == '0' || list->array[list->position_x-1][list->position_y] == 'C')
+	{
+		if(list->array[list->position_x-1][list->position_y] == 'C')
+					{
+						mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x-1)*64);
+						(*counter)++;
+					}
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x-1)*64);
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
+		list->array[list->position_x - 1][list->position_y] = 'P';
+		list->array[list->position_x][list->position_y] = '0';
+	}
+	else
+		return;
+}
+void move_down(t_list *list,int *counter)
+{
+	list ->position_x = 0;
+	list ->position_y = 0;
+	void *tmp;
+	locating_Start_point(list->array, &list->position_x, &list->position_y);
+	if (list->array[list->position_x + 1][list->position_y] == '0' || list->array[list->position_x+1][list->position_y] == 'C')
+	{
+		if(list->array[list->position_x+1][list->position_y] == 'C')
+		{
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x+1)*64);
+			(*counter)++;
+		}
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x+1)*64);
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
+		list->array[list->position_x + 1][list->position_y] = 'P';
+		list->array[list->position_x][list->position_y] = '0';
+	}
+	else
+		return;
+}
+
+void move_left(t_list *list,int *counter)
+{
+	list ->position_x = 0;
+	list ->position_y = 0;
+	void *tmp;
+	locating_Start_point(list->array, &list->position_x, &list->position_y);
+	if (list->array[list->position_x][list->position_y-1] == '0' || list->array[list->position_x][list->position_y-1] == 'C')
+	{
+		if(list->array[list->position_x][list->position_y-1] == 'C')
+		{
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y-1)*64, list->position_x*64);
+			(*counter)++;
+		}
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y-1)*64, list->position_x*64);
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
+		list->array[list->position_x][list->position_y-1] = 'P';
+		list->array[list->position_x][list->position_y] = '0';
+	}
+	else
+		return;
+}
+void move_right(t_list *list, int *counter)
+{
+	list ->position_x = 0;
+	list ->position_y = 0;
+	void *tmp;
+	locating_Start_point(list->array, &list->position_x, &list->position_y);
+	if (list->array[list->position_x][list->position_y+1] == '0' || list->array[list->position_x][list->position_y+1] == 'C')
+	{
+		if(list->array[list->position_x][list->position_y+1] == 'C')
+		{
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y+1)*64, list->position_x*64);
+			(*counter)++;
+		}
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y+1)*64, list->position_x*64);
+		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
+		list->array[list->position_x][list->position_y+1] = 'P';
+		list->array[list->position_x][list->position_y] = '0';
+	}
+	else
+		return;
+}
+
 int main()
 {
 	t_list list;
@@ -496,6 +510,6 @@ int main()
 	// {
 	// 	printf("%s\n", list.array[i++]);
 	// }
-	
 	displaying_img(list);
+	//printf("hello");
 }

@@ -6,7 +6,7 @@
 /*   By: souledla <souledla@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 11:57:52 by souledla          #+#    #+#             */
-/*   Updated: 2022/12/14 12:13:32 by souledla         ###   ########.fr       */
+/*   Updated: 2023/03/11 17:39:46 by souledla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,8 @@
 #  define BUFFER_SIZE 42
 # endif
 # include <stdio.h>
-# include <fcntl.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <limits.h>
 
 char	*get_next_line(int fd);
 int		ft_strlen(char *s);
