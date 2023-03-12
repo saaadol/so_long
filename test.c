@@ -347,117 +347,233 @@ void checking_size_map(char **array, t_list list)
 		i++;
 	}
 }
+
 int moving_player(int keycode, t_list *list)
 {
-	int counter = 0;
+	static int counter = 0;
+	static int flag = 0;
 	if (keycode == 13 || keycode == 126)
 	{
 		int fd = open("moves1", O_CREAT | O_TRUNC| O_WRONLY, 0777);
 		dup2(fd, 1);
 		//printf("hello");
-		move_up(list, &counter);
+		counter = move_up(list, counter, &flag);
+		printf("%d", counter);
 	}
 	else if (keycode == 1 || keycode == 125)
-		move_down(list, &counter);
+		counter = move_down(list, counter, &flag);
 	else if (keycode == 0 || keycode == 123)
-		move_left(list, &counter);
+		{
+			counter = move_left(list, counter, &flag);
+		}
 	else if (keycode == 2 || keycode == 124)
-		move_right(list, &counter);
+		counter = move_right(list, counter, &flag);
 	else if (keycode == 53)
 	{
 		mlx_destroy_window(list->mlx,list->mlx_win)	;
 		exit(1);
 	}
-
 	return(counter);
 }
 
-void move_up(t_list *list,int *counter)
+int move_up(t_list *list,int counter, int *flag)
 {
 	list ->position_x = 0;
 	list ->position_y = 0;
 	void *tmp;
+	if (!flag)
+		return 0;
 	locating_Start_point(list->array, &list->position_x, &list->position_y);
 	if (list->array[list->position_x - 1][list->position_y] == '0' || list->array[list->position_x-1][list->position_y] == 'C')
 	{
 		if(list->array[list->position_x-1][list->position_y] == 'C')
 					{
 						mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x-1)*64);
-						(*counter)++;
+						counter++;
 					}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x-1)*64);
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
 		list->array[list->position_x - 1][list->position_y] = 'P';
 		list->array[list->position_x][list->position_y] = '0';
 	}
-	else
-		return;
+	else if (list->array[list->position_x - 1][list->position_y] == 'E')
+	{
+		if (counter == list->coin)
+		{
+			mlx_destroy_window(list->mlx,list->mlx_win);
+			exit(1);
+		}
+	}
+	else if (list->array[list->position_x-1 ][list->position_y] == 'N')
+	{
+		*flag = 1;
+		displaying_you_died(list);
+	}
+	return counter;
 }
-void move_down(t_list *list,int *counter)
+int move_down(t_list *list,int counter, int *flag)
 {
 	list ->position_x = 0;
 	list ->position_y = 0;
 	void *tmp;
+	if (*flag == 1)
+		return 0;
 	locating_Start_point(list->array, &list->position_x, &list->position_y);
 	if (list->array[list->position_x + 1][list->position_y] == '0' || list->array[list->position_x+1][list->position_y] == 'C')
 	{
 		if(list->array[list->position_x+1][list->position_y] == 'C')
 		{
 			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x+1)*64);
-			(*counter)++;
+			counter++;
 		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x+1)*64);
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
 		list->array[list->position_x + 1][list->position_y] = 'P';
 		list->array[list->position_x][list->position_y] = '0';
 	}
-	else
-		return;
+	else if (list->array[list->position_x + 1][list->position_y] == 'E')
+	{
+		if (counter == list->coin)
+		{
+			mlx_destroy_window(list->mlx,list->mlx_win);
+			exit(1);
+		}
+	}
+	else if (list->array[list->position_x+1][list->position_y] == 'N')
+	{
+		*flag = 1;
+		displaying_you_died(list);
+	}
+	return counter;
 }
 
-void move_left(t_list *list,int *counter)
+int move_left(t_list *list,int counter, int *flag)
 {
 	list ->position_x = 0;
 	list ->position_y = 0;
 	void *tmp;
 	locating_Start_point(list->array, &list->position_x, &list->position_y);
+	if (*flag == 1)
+		return -1;
 	if (list->array[list->position_x][list->position_y-1] == '0' || list->array[list->position_x][list->position_y-1] == 'C')
 	{
 		if(list->array[list->position_x][list->position_y-1] == 'C')
 		{
 			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y-1)*64, list->position_x*64);
-			(*counter)++;
+			counter++;
 		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y-1)*64, list->position_x*64);
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
 		list->array[list->position_x][list->position_y-1] = 'P';
 		list->array[list->position_x][list->position_y] = '0';
 	}
-	else
-		return;
+	else if (list->array[list->position_x][list->position_y-1] == 'E')
+	{
+		if (counter == list->coin)
+		{
+			mlx_destroy_window(list->mlx,list->mlx_win);
+			exit(1);
+		}
+	}
+	else if (list->array[list->position_x ][list->position_y-1] == 'N')
+	{
+		*flag = 1;
+		displaying_you_died(list);
+	}
+	return counter;
 }
-void move_right(t_list *list, int *counter)
+int move_right(t_list *list, int counter, int *flag)
 {
 	list ->position_x = 0;
 	list ->position_y = 0;
 	void *tmp;
+	if (*flag == 1)
+		return 0;
 	locating_Start_point(list->array, &list->position_x, &list->position_y);
 	if (list->array[list->position_x][list->position_y+1] == '0' || list->array[list->position_x][list->position_y+1] == 'C')
 	{
 		if(list->array[list->position_x][list->position_y+1] == 'C')
 		{
 			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y+1)*64, list->position_x*64);
-			(*counter)++;
+			counter++;
 		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y+1)*64, list->position_x*64);
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
 		list->array[list->position_x][list->position_y+1] = 'P';
 		list->array[list->position_x][list->position_y] = '0';
 	}
-	else
-		return;
-}
+	else if (list->array[list->position_x ][list->position_y+1] == 'E')
+	{
+		if (counter == list->coin)
+		{
+			mlx_destroy_window(list->mlx,list->mlx_win);
+			exit(1);
+		}
+	}
+	else if (list->array[list->position_x ][list->position_y+1] == 'N')
+	{
+		*flag = 1;
+		displaying_you_died(list);
+	}
 
+	return counter;
+}
+void displaying_you_died(t_list *list)
+{
+
+
+	list->position_y = list->columns  / 2;
+	list->position_x = (list->rows + 1) / 2;
+	list->array[list->position_x][list->position_y - 3] = 'Y';
+	list->array[list->position_x][list->position_y - 2] = 'O';
+	list->array[list->position_x][list->position_y - 1] = 'U';
+	list->array[list->position_x][list->position_y+1] = 'S';
+	list->array[list->position_x][list->position_y+2] = 'U';
+	list->array[list->position_x][list->position_y+3] = 'c';
+	list->array[list->position_x][list->position_y+4] = 'K';
+	list->position_x = 0;
+	list->position_y = 0;
+	list->img_Y = mlx_xpm_file_to_image(list->mlx, "Y.xpm", &list->img_width, &list->img_height);
+	list->img_O = mlx_xpm_file_to_image(list->mlx, "O.xpm", &list->img_width, &list->img_height);
+	list->img_U = mlx_xpm_file_to_image(list->mlx, "U.xpm", &list->img_width, &list->img_height);
+	list->img_S = mlx_xpm_file_to_image(list->mlx, "S.xpm", &list->img_width, &list->img_height);
+	list->img_C = mlx_xpm_file_to_image(list->mlx, "C.xpm", &list->img_width, &list->img_height);
+	list->img_K = mlx_xpm_file_to_image(list->mlx, "K.xpm", &list->img_width, &list->img_height);
+	while (list->array[list->position_x])
+	{
+		list->position_y = 0;
+		while (list->array[list->position_x][list->position_y])
+		{
+			if (list->array[list->position_x][list->position_y] == 'Y')
+			{
+				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_Y, list->position_y*64, list->position_x*64);
+			}
+			else if (list->array[list->position_x][list->position_y] == 'O')
+			{
+				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_O, list->position_y*64, list->position_x*64);
+			}
+			else if (list->array[list->position_x][list->position_y] == 'U')
+			{
+				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_U, list->position_y*64, list->position_x*64);
+			}
+			else if (list->array[list->position_x][list->position_y] == 'S')
+			{
+				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_S, list->position_y*64, list->position_x*64);
+			}
+			else if (list->array[list->position_x][list->position_y] == 'c')
+			{
+				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_C, list->position_y*64, list->position_x*64);
+			}
+			else if (list->array[list->position_x][list->position_y] == 'K')
+			{
+				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_K, list->position_y*64, list->position_x*64);
+			}
+		list->position_y++;
+		}
+		list->position_x++;
+
+	}	
+}
 int main()
 {
 	t_list list;
@@ -503,13 +619,18 @@ int main()
 	locating_Start_point(list.array, &list.player_x, &list.player_y);
 	filling_map_with_x(list.array, list.player_x, list.player_y);
 	checking_valid_path(list.array);
-	list.coin = counting_collectibles(list.array);
 	list.array = ft_split(joined, '\n');
+	list.coin = counting_collectibles(list.array);
 	i = 0;
 	// while (list.array[i])
 	// {
 	// 	printf("%s\n", list.array[i++]);
 	// }
+	// char url[] = "https://www.youtube.com/watch?v=w99vz_wj1S0";
+	// char command[1024];
+    // sprintf(command, "open \"%s\"", url);
+    // system(command);
+    // return 0;
 	displaying_img(list);
 	//printf("hello");
 }

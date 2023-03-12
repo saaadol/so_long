@@ -4,7 +4,8 @@
 void displaying_img(t_list list)
 {
 	// int counter = 0;
-	// printf("%d \n",list.columns);
+	printf("%d \n",(list.columns) * 64);
+	printf("%d \n",(list.rows+1) * 64);
 	int i = 0;
 	int j = 0;
 	int x = 0;
@@ -77,7 +78,6 @@ void displaying_img(t_list list)
 		list.position_x++;
 	}
 	mlx_hook(list.mlx_win, 2, 1<<0, moving_player, &list);
-	
 	
 	mlx_loop(list.mlx);
 }
