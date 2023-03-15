@@ -22,6 +22,9 @@ typedef struct t_list
 	void *img_floor;
 	void *img_soil;
 	void *img_you_died;
+	void *water_img[3];
+	void *img_water_2;
+	void *img_water_3;
 	void *img_Y;
 	void *img_O;
 	void *img_U;
@@ -36,15 +39,22 @@ typedef struct t_list
 	void *mlx_win;
 	int img_width;
 	int img_height;
+	int *array_collectibles;
 	int position_x;
 	int position_y;
 	char *img_path;
+	int **collectibles_pos;
 } t_list;
-void displaying_img(t_list list);
+int displaying_img(t_list list);
 int moving_player(int keycode, t_list *list);
 int move_up(t_list *list,int counter, int *flag);
 int move_down(t_list *list,int counter, int *flag);
 int move_left(t_list *list,int counter, int *flag);
 int move_right(t_list *list,int counter, int *flag);
 void displaying_you_died(t_list *list);
+int displaying_sprite(t_list *list);
+int *searching_for_collectibles(t_list list);
+int **array_of_collectibles(t_list list);
+void locating_Start_point(char **array, int *i, int *j);
+char	*ft_itoa(int c1);
 #endif

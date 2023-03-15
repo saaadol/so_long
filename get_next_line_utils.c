@@ -6,7 +6,7 @@
 /*   By: souledla <souledla@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 13:13:18 by souledla          #+#    #+#             */
-/*   Updated: 2022/12/21 13:46:41 by souledla         ###   ########.fr       */
+/*   Updated: 2023/03/15 16:29:37 by souledla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	*ft_strdup(char *s1)
 	int		i;
 
 	i = 0;
-	temp = (char *)malloc(sizeof (char) * (ft_strlen(s1) + 1));
+	temp = (char *)calloc(sizeof (char), (ft_strlen(s1) + 1));
 	if (!temp)
 		return (0);
 	while (s1[i])
@@ -52,7 +52,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	j = 0;
 	if (!s2)
 		return (NULL);
-	p = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	p = calloc(ft_strlen(s1) + ft_strlen(s2) + 1, sizeof(char));
 	if (!p)
 		return (NULL);
 	while (s1[i])

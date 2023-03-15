@@ -12,7 +12,7 @@ char	*ft_join(char *s1, char *s2)
 	j = 0;
 	if (!s2)
 		return (NULL);
-	p = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	p = calloc(ft_strlen(s1) + ft_strlen(s2) + 1, sizeof(char));
 	if (!p)
 		return (NULL);
 	while (s1[i])
@@ -87,7 +87,7 @@ static char	*ft_word(char const *s, char c)
 
 	i = 0;
 	len_word = ft_strlen_checker(s, c);
-	word = (char *)malloc(sizeof(char) * (len_word + 1));
+	word = (char *)calloc(sizeof(char), (len_word + 1));
 	if (!word)
 		return (0);
 	while (i < len_word)
@@ -109,7 +109,7 @@ char	**ft_split(char const *s, char c)
 	if (!s)
 		return (0);
 	i = 0;
-	str = (char **)malloc(sizeof(char *) * (ft_count_word(s, c) + 1));
+	str = (char **)calloc(sizeof(char *), (ft_count_word(s, c) + 1));
 	if (!str)
 		return (0);
 	while (*s != '\0')
@@ -350,15 +350,16 @@ void checking_size_map(char **array, t_list list)
 
 int moving_player(int keycode, t_list *list)
 {
+	static int x;
 	static int counter = 0;
 	static int flag = 0;
 	if (keycode == 13 || keycode == 126)
 	{
-		int fd = open("moves1", O_CREAT | O_TRUNC| O_WRONLY, 0777);
-		dup2(fd, 1);
+		// int fd = open("moves1", O_CREAT | O_TRUNC| O_WRONLY, 0777);
+		// dup2(fd, 1);
 		//printf("hello");
 		counter = move_up(list, counter, &flag);
-		printf("%d", counter);
+		// printf("%d", counter);
 	}
 	else if (keycode == 1 || keycode == 125)
 		counter = move_down(list, counter, &flag);
@@ -373,13 +374,18 @@ int moving_player(int keycode, t_list *list)
 		mlx_destroy_window(list->mlx,list->mlx_win)	;
 		exit(1);
 	}
+	mlx_string_put(list->mlx, list->mlx_win, 64, 64+1, 17,ft_itoa(x));
+	x++;
+	//printf("%d", x);
 	return(counter);
 }
+
 
 int move_up(t_list *list,int counter, int *flag)
 {
 	list ->position_x = 0;
 	list ->position_y = 0;
+	int x = 0;
 	void *tmp;
 	if (!flag)
 		return 0;
@@ -387,10 +393,20 @@ int move_up(t_list *list,int counter, int *flag)
 	if (list->array[list->position_x - 1][list->position_y] == '0' || list->array[list->position_x-1][list->position_y] == 'C')
 	{
 		if(list->array[list->position_x-1][list->position_y] == 'C')
-					{
-						mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x-1)*64);
-						counter++;
-					}
+		{
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x-1)*64);
+			while (list->collectibles_pos[x])
+			{
+				if (list->collectibles_pos[x][0] == list->position_x-1 && list->collectibles_pos[x][1] == list->position_y)
+				{
+					list->collectibles_pos[x][0]= -1;
+					list->collectibles_pos[x][1]= -1;
+				}
+				x++;
+			}
+			
+			counter++;
+		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x-1)*64);
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
 		list->array[list->position_x - 1][list->position_y] = 'P';
@@ -415,6 +431,7 @@ int move_down(t_list *list,int counter, int *flag)
 {
 	list ->position_x = 0;
 	list ->position_y = 0;
+	int x = 0;
 	void *tmp;
 	if (*flag == 1)
 		return 0;
@@ -424,6 +441,15 @@ int move_down(t_list *list,int counter, int *flag)
 		if(list->array[list->position_x+1][list->position_y] == 'C')
 		{
 			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x+1)*64);
+			while (list->collectibles_pos[x])
+			{
+				if (list->collectibles_pos[x][0] == list->position_x+1 && list->collectibles_pos[x][1] == list->position_y)
+				{
+					list->collectibles_pos[x][0]= -1;
+					list->collectibles_pos[x][1]= -1;
+				}
+				x++;
+			}
 			counter++;
 		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x+1)*64);
@@ -452,6 +478,7 @@ int move_left(t_list *list,int counter, int *flag)
 	list ->position_x = 0;
 	list ->position_y = 0;
 	void *tmp;
+	int x = 0;
 	locating_Start_point(list->array, &list->position_x, &list->position_y);
 	if (*flag == 1)
 		return -1;
@@ -460,6 +487,15 @@ int move_left(t_list *list,int counter, int *flag)
 		if(list->array[list->position_x][list->position_y-1] == 'C')
 		{
 			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y-1)*64, list->position_x*64);
+			while (list->collectibles_pos[x])
+			{
+				if (list->collectibles_pos[x][0] == list->position_x && list->collectibles_pos[x][1] == list->position_y-1)
+				{
+					list->collectibles_pos[x][0]= -1;
+					list->collectibles_pos[x][1]= -1;
+				}
+				x++;
+			}
 			counter++;
 		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y-1)*64, list->position_x*64);
@@ -487,6 +523,7 @@ int move_right(t_list *list, int counter, int *flag)
 	list ->position_x = 0;
 	list ->position_y = 0;
 	void *tmp;
+	int x = 0;
 	if (*flag == 1)
 		return 0;
 	locating_Start_point(list->array, &list->position_x, &list->position_y);
@@ -495,6 +532,15 @@ int move_right(t_list *list, int counter, int *flag)
 		if(list->array[list->position_x][list->position_y+1] == 'C')
 		{
 			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y+1)*64, list->position_x*64);
+			while (list->collectibles_pos[x])
+			{
+				if (list->collectibles_pos[x][0] == list->position_x && list->collectibles_pos[x][1] == list->position_y+1)
+				{
+					list->collectibles_pos[x][0]= -1;
+					list->collectibles_pos[x][1]= -1;
+				}
+				x++;
+			}
 			counter++;
 		}
 		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y+1)*64, list->position_x*64);
@@ -515,7 +561,6 @@ int move_right(t_list *list, int counter, int *flag)
 		*flag = 1;
 		displaying_you_died(list);
 	}
-
 	return counter;
 }
 void displaying_you_died(t_list *list)
@@ -631,6 +676,20 @@ int main()
     // sprintf(command, "open \"%s\"", url);
     // system(command);
     // return 0;
+	// int **arr;
+	// int **list_of_collectibles = array_of_collectibles(list);
+
+	list.collectibles_pos = array_of_collectibles(list);
+	// while (list.collectibles_pos[i]) {
+	// 	printf("(%d, %d) ", list.collectibles_pos[i][0], list.collectibles_pos[i][1]);
+	// 	i++;
+	// }
 	displaying_img(list);
+	// printf("%d", t[0]);
+	// printf("%d", t[1]);
+	
+	// t = searching_for_collectibles(list);
+	//printf("%d",t);
+	
 	//printf("hello");
 }

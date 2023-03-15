@@ -6,7 +6,7 @@
 /*   By: souledla <souledla@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 11:58:37 by souledla          #+#    #+#             */
-/*   Updated: 2023/02/14 00:07:06 by souledla         ###   ########.fr       */
+/*   Updated: 2023/03/15 16:30:05 by souledla         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ char	*findline(int fd, char *str)
 	int		re;
 
 	re = 1;
-	stash = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	stash = calloc(sizeof(char), (BUFFER_SIZE + 1));
 	if (!stash)
 		return (free(str), NULL);
 	while (re && !ft_strchr(str, '\n'))
@@ -60,7 +60,7 @@ char	*newline(char *str)
 	if (!str[i])
 		return (NULL);
 	len = isnew(str);
-	stash = malloc(sizeof(char) * (len + 1));
+	stash = calloc(sizeof(char), (len + 1));
 	if (!stash)
 		return (NULL);
 	while (str[i] && str[i] != '\n')
@@ -86,7 +86,7 @@ char	*afterline(char *str)
 		return (free(str), NULL);
 	i = 0;
 	len = ft_strlen(str) - j + 1;
-	stash = malloc(sizeof(char) * len);
+	stash = calloc(sizeof(char), len);
 	if (!stash)
 		return (NULL);
 	while (str[j])
