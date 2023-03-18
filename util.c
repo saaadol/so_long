@@ -6,6 +6,7 @@ int **array_of_collectibles(t_list list)
 	int i = 0;
 	int x = 0;
 	int y = 0;
+	int flag = 0;
 	int **list_of_collectibles;
 	int *array;
 	list_of_collectibles = calloc(sizeof(int *), list.coin + 1);
@@ -28,11 +29,44 @@ int **array_of_collectibles(t_list list)
 	}
 	free(array);
 	i = 0;
-	while (list_of_collectibles[i]) {
-		puts("hello");
-		printf("(%d, %d) ", list_of_collectibles[i][0], list_of_collectibles[i][1]);
+	return list_of_collectibles;
+}
+int **array_of_enemies(t_list list, int flag)
+{
+	int i = 0;
+	int x = 0;
+	int y = 0;
+	int **list_of_collectibles;
+	int *array;
+	list_of_collectibles = calloc(sizeof(int *), list.enemies + 2);
+	while (i < list.enemies + 2)
+	{
+		list_of_collectibles[i] = calloc(sizeof(int), 2);
 		i++;
 	}
+	array = searching_for_enemies(list, flag);
+
+	while (1)
+	{
+		// if (x == 5)
+		// 	exit(0);
+		list_of_collectibles[x][0] = array[0];
+		list_of_collectibles[x][1] = array[1];
+		if(list_of_collectibles[x][0] == -1)
+		{
+			list_of_collectibles[x + 1] = NULL;
+			break;
+		}
+		free(array);
+		array = searching_for_enemies(list, 0);
+		x++;
+	}
+	i = 0;
+	// while (list_of_collectibles[i]) {
+	// 	puts("hello");
+	// 	printf("(%d, %d) ", list_of_collectibles[i][0], list_of_collectibles[i][1]);
+	// 	i++;
+	// }
 	return list_of_collectibles;
 }
 int *searching_for_collectibles(t_list list)
@@ -40,7 +74,6 @@ int *searching_for_collectibles(t_list list)
 	int *array;
 	static int x = 0;
  	static int y = 0;
-	
 	array = calloc(sizeof(int), 2);
 	while (list.array[x])
 	{
@@ -65,6 +98,41 @@ int *searching_for_collectibles(t_list list)
 		return array;
 	}
 
+	return array;
+}
+int *searching_for_enemies(t_list list,int flag)
+{
+	int *array;
+	static int x = 0;
+ 	static int y = 0;
+	array = calloc(sizeof(int), 2);
+	if (flag == 1)
+	{
+		x = 0; 
+		y = 0;
+	}
+	while (list.array[x])
+	{
+		while(list.array[x][y])
+		{
+			if (list.array[x][y] == 'N')
+			{
+				array[0] = x;
+				array[1] = y;
+				y++;
+				return array;
+			}
+			y++;
+		}
+		y = 0;
+		x++;
+	}
+	if (x - 1 == list.rows)
+	{
+		array[0] = -1;
+		array[1] = -1;
+		return array;
+	}
 	return array;
 }
 // int *searching_for_collectibles(t_list list)
@@ -101,11 +169,16 @@ int displaying_sprite(t_list *list)
 		static int  i = 0;
 		static int	j = 0;
 		int x = 0;
-
+		static int s = 0;
+		static int b = 0;
+		static int k = 0;
+		int t;
 		while (list->collectibles_pos[x])
 		{
 			if(list->collectibles_pos[x][0] == -1 && list->collectibles_pos[x][1] == -1)
+			{
 				x++;
+			}
 			if	(list->collectibles_pos[x])
 			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->water_img[j], list->collectibles_pos[x][1] * 64, list->collectibles_pos[x][0] * 64);
@@ -113,14 +186,114 @@ int displaying_sprite(t_list *list)
 			}
 		}
 		i = (i+1) % 3;
+		if (s == 10)
+		{
+			if (k == 0)
+				k = 1;
+			else
+				k = 0;
+			s = 0;
+		}
 		if (!i)
+		{
 			j++;
+			if (t == -1)
+			{
+				return 0;
+			}
+			if (k == 0)
+			{
+				list->enemy_pos = array_of_enemies(*list, 1);
+				t = moving_enemy_left(list);
+			}
+			else
+			{
+				list->enemy_pos = array_of_enemies(*list, 1);
+				t = moving_enemy_right(list);
+			}
+			if (t == 1)
+				s++;
+		}
 		j = j % 3;
+	
 
 	return 0;
-
 }
+int moving_enemy_left(t_list *list)
+{
+	static int x = 0;
+	int t = 0;
 
+		if (list->enemy_pos[x][0] == -1)
+		{
+			x = 0;
+			t = 0;
+			list->enemy_pos = array_of_enemies(*list, 1);
+		}
+		if (list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] -1] == '0')
+		{
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_enemy, (list->enemy_pos[x][1] -1)*64, list->enemy_pos[x][0]*64);
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->enemy_pos[x][1]*64, list->enemy_pos[x][0]*64);
+			list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] -1] = 'N';
+			list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1]] = '0';
+		}
+		else if (list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] -3] == 'N' )
+		{
+			return 1;	
+		}
+		else if (list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] - 1] == 'P' )
+		{
+			displaying_you_died(list);
+			return -1;	
+		}
+		else
+		{
+			t++;
+			if (t == list->enemies)
+				return t;
+		}
+		x++;
+
+	
+	return t;
+}
+int moving_enemy_right(t_list *list)
+{
+	static int x = 0;
+	int t = 0;
+		if (list->enemy_pos[x][0] == -1)
+		{
+			x = 0;
+			t = 0;
+			list->enemy_pos = array_of_enemies(*list, 1);
+		}
+		if (list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] +1] == '0')
+		{
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_enemy, (list->enemy_pos[x][1] +1)*64, list->enemy_pos[x][0]*64);
+			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->enemy_pos[x][1]*64, list->enemy_pos[x][0]*64);
+			list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] +1] = 'N';
+			list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1]] = '0';
+		}
+		else if (list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] +3] == 'N' )
+			x++;
+		else if (list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] +1] == 'P')
+		{
+			displaying_you_died(list);
+			return -1;
+		}	
+		else
+		{
+			t++;
+			if (t == list->enemies )
+			{
+				printf("%c \n", list->array[list->enemy_pos[x][0]][list->enemy_pos[x][1] +1]);
+				return t;
+			}
+		}
+		x++;
+	
+	return t;
+}
 int displaying_img(t_list list)
 {
 	int i = 0;
@@ -208,6 +381,7 @@ int displaying_img(t_list list)
 	}
 	
 	
+	//mlx_loop_hook(list.mlx, &moving_enemy, &list);
 	mlx_loop_hook(list.mlx, &displaying_sprite, &list);
 	mlx_hook(list.mlx_win, 2, 1<<0, moving_player, &list);
 	mlx_loop(list.mlx);

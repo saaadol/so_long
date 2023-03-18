@@ -44,6 +44,8 @@ typedef struct t_list
 	int position_y;
 	char *img_path;
 	int **collectibles_pos;
+	int **enemy_pos;
+	int enemies;
 } t_list;
 int displaying_img(t_list list);
 int moving_player(int keycode, t_list *list);
@@ -57,4 +59,11 @@ int *searching_for_collectibles(t_list list);
 int **array_of_collectibles(t_list list);
 void locating_Start_point(char **array, int *i, int *j);
 char	*ft_itoa(int c1);
+int counting_enemies(char **buffer);
+int **array_of_enemies(t_list list, int flag);
+int *searching_for_enemies(t_list list, int flag);
+int moving_enemy(t_list *list);
+char	**ft_free(char **str, size_t j);
+int moving_enemy_left(t_list *list);
+int moving_enemy_right(t_list *list);
 #endif

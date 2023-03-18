@@ -177,6 +177,24 @@ int counting_collectibles(char **buffer)
 	}
 	return counter;
 }
+int counting_enemies(char **buffer)
+{
+	int counter = 0;
+	int i = 0;
+	int j = 0;
+	while (buffer[i])
+	{
+		j = 0;
+		while (buffer[i][j])
+		{	
+			if (buffer[i][j] == 'N')
+				counter++;
+			j++;
+		}
+			i++;
+	}
+	return counter;
+}
 void check_startpoint_exit(char *buffer)
 {
 	int i = 0;
@@ -355,28 +373,31 @@ int moving_player(int keycode, t_list *list)
 	static int flag = 0;
 	if (keycode == 13 || keycode == 126)
 	{
-		// int fd = open("moves1", O_CREAT | O_TRUNC| O_WRONLY, 0777);
-		// dup2(fd, 1);
-		//printf("hello");
 		counter = move_up(list, counter, &flag);
-		// printf("%d", counter);
+		x++;
 	}
 	else if (keycode == 1 || keycode == 125)
+	{
 		counter = move_down(list, counter, &flag);
+		x++;
+	}
 	else if (keycode == 0 || keycode == 123)
 		{
 			counter = move_left(list, counter, &flag);
+			x++;
 		}
 	else if (keycode == 2 || keycode == 124)
+	{
 		counter = move_right(list, counter, &flag);
+		x++;
+	}
 	else if (keycode == 53)
 	{
 		mlx_destroy_window(list->mlx,list->mlx_win)	;
 		exit(1);
 	}
-	mlx_string_put(list->mlx, list->mlx_win, 64, 64+1, 17,ft_itoa(x));
-	x++;
-	//printf("%d", x);
+	mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_sky, 0,0);	
+	mlx_string_put(list->mlx, list->mlx_win, 0, 0, 17,ft_itoa(x));
 	return(counter);
 }
 
@@ -666,6 +687,7 @@ int main()
 	checking_valid_path(list.array);
 	list.array = ft_split(joined, '\n');
 	list.coin = counting_collectibles(list.array);
+	list.enemies = counting_enemies(list.array);
 	i = 0;
 	// while (list.array[i])
 	// {
@@ -678,10 +700,12 @@ int main()
     // return 0;
 	// int **arr;
 	// int **list_of_collectibles = array_of_collectibles(list);
-
+	//printf("%d", list.enemies);
 	list.collectibles_pos = array_of_collectibles(list);
-	// while (list.collectibles_pos[i]) {
-	// 	printf("(%d, %d) ", list.collectibles_pos[i][0], list.collectibles_pos[i][1]);
+	list.enemy_pos = array_of_enemies(list,0);
+	// while(list.enemy_pos[i])
+	// {
+	// 	printf("(%d %d)\n", list.enemy_pos[i][0],list.enemy_pos[i][1]);
 	// 	i++;
 	// }
 	displaying_img(list);
