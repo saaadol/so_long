@@ -79,6 +79,27 @@ char	**ft_free(char **str, size_t j)
 	return (0);
 }
 
+void	ft_frees(int **str, size_t j)
+{
+	int	i;
+
+	i = j;
+	while (i >= 0)
+	{
+		if (i == 0)
+		{
+			free(str[i]);
+			str[i] = 0;
+			break ;
+		}
+		free(str[i]);
+		str[i] = 0;
+		i--;
+	}
+	free(str);
+	str = 0;
+}
+
 static char	*ft_word(char const *s, char c)
 {
 	size_t	len_word;
@@ -212,6 +233,11 @@ void check_startpoint_exit(char *buffer)
 				exit(1);
 			}
 		i++;
+	}
+	if (counter1 == 0 || counter2 == 0)
+	{
+		perror("No Exit point or Start point");
+		exit(1);
 	}
 }
 
@@ -366,354 +392,123 @@ void checking_size_map(char **array, t_list list)
 	}
 }
 
-int moving_player(int keycode, t_list *list)
-{
-	static int x;
-	static int counter = 0;
-	static int flag = 0;
-	if (keycode == 13 || keycode == 126)
-	{
-		counter = move_up(list, counter, &flag);
-		x++;
-	}
-	else if (keycode == 1 || keycode == 125)
-	{
-		counter = move_down(list, counter, &flag);
-		x++;
-	}
-	else if (keycode == 0 || keycode == 123)
-		{
-			counter = move_left(list, counter, &flag);
-			x++;
-		}
-	else if (keycode == 2 || keycode == 124)
-	{
-		counter = move_right(list, counter, &flag);
-		x++;
-	}
-	else if (keycode == 53)
-	{
-		mlx_destroy_window(list->mlx,list->mlx_win)	;
-		exit(1);
-	}
-	mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_sky, 0,0);	
-	mlx_string_put(list->mlx, list->mlx_win, 0, 0, 17,ft_itoa(x));
-	return(counter);
-}
-
-
-int move_up(t_list *list,int counter, int *flag)
-{
-	list ->position_x = 0;
-	list ->position_y = 0;
-	int x = 0;
-	void *tmp;
-	if (!flag)
-		return 0;
-	locating_Start_point(list->array, &list->position_x, &list->position_y);
-	if (list->array[list->position_x - 1][list->position_y] == '0' || list->array[list->position_x-1][list->position_y] == 'C')
-	{
-		if(list->array[list->position_x-1][list->position_y] == 'C')
-		{
-			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x-1)*64);
-			while (list->collectibles_pos[x])
-			{
-				if (list->collectibles_pos[x][0] == list->position_x-1 && list->collectibles_pos[x][1] == list->position_y)
-				{
-					list->collectibles_pos[x][0]= -1;
-					list->collectibles_pos[x][1]= -1;
-				}
-				x++;
-			}
-			
-			counter++;
-		}
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x-1)*64);
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
-		list->array[list->position_x - 1][list->position_y] = 'P';
-		list->array[list->position_x][list->position_y] = '0';
-	}
-	else if (list->array[list->position_x - 1][list->position_y] == 'E')
-	{
-		if (counter == list->coin)
-		{
-			mlx_destroy_window(list->mlx,list->mlx_win);
-			exit(1);
-		}
-	}
-	else if (list->array[list->position_x-1 ][list->position_y] == 'N')
-	{
-		*flag = 1;
-		displaying_you_died(list);
-	}
-	return counter;
-}
-int move_down(t_list *list,int counter, int *flag)
-{
-	list ->position_x = 0;
-	list ->position_y = 0;
-	int x = 0;
-	void *tmp;
-	if (*flag == 1)
-		return 0;
-	locating_Start_point(list->array, &list->position_x, &list->position_y);
-	if (list->array[list->position_x + 1][list->position_y] == '0' || list->array[list->position_x+1][list->position_y] == 'C')
-	{
-		if(list->array[list->position_x+1][list->position_y] == 'C')
-		{
-			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, (list->position_x+1)*64);
-			while (list->collectibles_pos[x])
-			{
-				if (list->collectibles_pos[x][0] == list->position_x+1 && list->collectibles_pos[x][1] == list->position_y)
-				{
-					list->collectibles_pos[x][0]= -1;
-					list->collectibles_pos[x][1]= -1;
-				}
-				x++;
-			}
-			counter++;
-		}
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, list->position_y*64, (list->position_x+1)*64);
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
-		list->array[list->position_x + 1][list->position_y] = 'P';
-		list->array[list->position_x][list->position_y] = '0';
-	}
-	else if (list->array[list->position_x + 1][list->position_y] == 'E')
-	{
-		if (counter == list->coin)
-		{
-			mlx_destroy_window(list->mlx,list->mlx_win);
-			exit(1);
-		}
-	}
-	else if (list->array[list->position_x+1][list->position_y] == 'N')
-	{
-		*flag = 1;
-		displaying_you_died(list);
-	}
-	return counter;
-}
-
-int move_left(t_list *list,int counter, int *flag)
-{
-	list ->position_x = 0;
-	list ->position_y = 0;
-	void *tmp;
-	int x = 0;
-	locating_Start_point(list->array, &list->position_x, &list->position_y);
-	if (*flag == 1)
-		return -1;
-	if (list->array[list->position_x][list->position_y-1] == '0' || list->array[list->position_x][list->position_y-1] == 'C')
-	{
-		if(list->array[list->position_x][list->position_y-1] == 'C')
-		{
-			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y-1)*64, list->position_x*64);
-			while (list->collectibles_pos[x])
-			{
-				if (list->collectibles_pos[x][0] == list->position_x && list->collectibles_pos[x][1] == list->position_y-1)
-				{
-					list->collectibles_pos[x][0]= -1;
-					list->collectibles_pos[x][1]= -1;
-				}
-				x++;
-			}
-			counter++;
-		}
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y-1)*64, list->position_x*64);
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
-		list->array[list->position_x][list->position_y-1] = 'P';
-		list->array[list->position_x][list->position_y] = '0';
-	}
-	else if (list->array[list->position_x][list->position_y-1] == 'E')
-	{
-		if (counter == list->coin)
-		{
-			mlx_destroy_window(list->mlx,list->mlx_win);
-			exit(1);
-		}
-	}
-	else if (list->array[list->position_x ][list->position_y-1] == 'N')
-	{
-		*flag = 1;
-		displaying_you_died(list);
-	}
-	return counter;
-}
-int move_right(t_list *list, int counter, int *flag)
-{
-	list ->position_x = 0;
-	list ->position_y = 0;
-	void *tmp;
-	int x = 0;
-	if (*flag == 1)
-		return 0;
-	locating_Start_point(list->array, &list->position_x, &list->position_y);
-	if (list->array[list->position_x][list->position_y+1] == '0' || list->array[list->position_x][list->position_y+1] == 'C')
-	{
-		if(list->array[list->position_x][list->position_y+1] == 'C')
-		{
-			mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, (list->position_y+1)*64, list->position_x*64);
-			while (list->collectibles_pos[x])
-			{
-				if (list->collectibles_pos[x][0] == list->position_x && list->collectibles_pos[x][1] == list->position_y+1)
-				{
-					list->collectibles_pos[x][0]= -1;
-					list->collectibles_pos[x][1]= -1;
-				}
-				x++;
-			}
-			counter++;
-		}
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img, (list->position_y+1)*64, list->position_x*64);
-		mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_floor, list->position_y*64, list->position_x*64);
-		list->array[list->position_x][list->position_y+1] = 'P';
-		list->array[list->position_x][list->position_y] = '0';
-	}
-	else if (list->array[list->position_x ][list->position_y+1] == 'E')
-	{
-		if (counter == list->coin)
-		{
-			mlx_destroy_window(list->mlx,list->mlx_win);
-			exit(1);
-		}
-	}
-	else if (list->array[list->position_x ][list->position_y+1] == 'N')
-	{
-		*flag = 1;
-		displaying_you_died(list);
-	}
-	return counter;
-}
 void displaying_you_died(t_list *list)
 {
-
-
 	list->position_y = list->columns  / 2;
 	list->position_x = (list->rows + 1) / 2;
-	list->array[list->position_x][list->position_y - 3] = 'Y';
-	list->array[list->position_x][list->position_y - 2] = 'O';
-	list->array[list->position_x][list->position_y - 1] = 'U';
-	list->array[list->position_x][list->position_y+1] = 'S';
-	list->array[list->position_x][list->position_y+2] = 'U';
-	list->array[list->position_x][list->position_y+3] = 'c';
-	list->array[list->position_x][list->position_y+4] = 'K';
-	list->position_x = 0;
-	list->position_y = 0;
-	list->img_Y = mlx_xpm_file_to_image(list->mlx, "Y.xpm", &list->img_width, &list->img_height);
-	list->img_O = mlx_xpm_file_to_image(list->mlx, "O.xpm", &list->img_width, &list->img_height);
-	list->img_U = mlx_xpm_file_to_image(list->mlx, "U.xpm", &list->img_width, &list->img_height);
-	list->img_S = mlx_xpm_file_to_image(list->mlx, "S.xpm", &list->img_width, &list->img_height);
-	list->img_C = mlx_xpm_file_to_image(list->mlx, "C.xpm", &list->img_width, &list->img_height);
-	list->img_K = mlx_xpm_file_to_image(list->mlx, "K.xpm", &list->img_width, &list->img_height);
+	assigning_values_displaying_you_died(list);
 	while (list->array[list->position_x])
 	{
 		list->position_y = 0;
 		while (list->array[list->position_x][list->position_y])
 		{
 			if (list->array[list->position_x][list->position_y] == 'Y')
-			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_Y, list->position_y*64, list->position_x*64);
-			}
 			else if (list->array[list->position_x][list->position_y] == 'O')
-			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_O, list->position_y*64, list->position_x*64);
-			}
 			else if (list->array[list->position_x][list->position_y] == 'U')
-			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_U, list->position_y*64, list->position_x*64);
-			}
 			else if (list->array[list->position_x][list->position_y] == 'S')
-			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_S, list->position_y*64, list->position_x*64);
-			}
 			else if (list->array[list->position_x][list->position_y] == 'c')
-			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_C, list->position_y*64, list->position_x*64);
-			}
 			else if (list->array[list->position_x][list->position_y] == 'K')
-			{
 				mlx_put_image_to_window(list->mlx, list->mlx_win, list->img_K, list->position_y*64, list->position_x*64);
-			}
 		list->position_y++;
 		}
 		list->position_x++;
-
 	}	
 }
-int main()
+void main_bonus_util(t_list *list, char *joined)
 {
-	t_list list;
-	char **array;
-	int fd = open("maps", O_RDWR, 0777);
 	int i = 0;
-	char *buffer;
-	list.player_x = 0;
-	list.player_y = 0;
-	char *joined = get_next_line(fd);
-	if (!joined)
-	{
-		perror("No such map");
-		exit(1);
-	}
-	list.columns = ft_strlen(joined) - 1;
-	list.rows = 1;
-	checking_first_wall(joined);
-	while(1)
-	{
-		buffer = get_next_line(fd);
-		if (!buffer)
-			break;
-		if (buffer[0] != '1' || buffer[ft_strlen(buffer) - 2] != '1')
-		{
-			perror("Invalid borders");
-			exit(1);
-		} 
-		if (!ft_strchr(buffer, '\n'))
-		{
-			checking_last_wall(buffer);
-			joined = ft_join(joined, buffer);
-			break;
-		}
-		joined = ft_join(joined, buffer);
-		list.rows++;
-	}
 	check_collectibles(joined);
 	check_startpoint_exit(joined);
 	checking_other_characters(joined);
-	list.array =  ft_split(joined, '\n');
-	checking_size_map(list.array, list);
-	locating_Start_point(list.array, &list.player_x, &list.player_y);
-	filling_map_with_x(list.array, list.player_x, list.player_y);
-	checking_valid_path(list.array);
-	list.array = ft_split(joined, '\n');
-	list.coin = counting_collectibles(list.array);
-	list.enemies = counting_enemies(list.array);
+	list->array =  ft_split(joined, '\n');
+	checking_size_map(list->array, *list);
+	list->player_x = 0;
+	list->player_y = 0;
+	locating_Start_point(list->array, &list->player_x, &list->player_y);
+	filling_map_with_x(list->array, list->player_x, list->player_y);
+	checking_valid_path(list->array);
+	list->array = ft_split(joined, '\n');
+	list->coin = counting_collectibles(list->array);
+	list->collectibles_pos = array_of_collectibles(*list);
+	list->coin = counting_collectibles(list->array);
+	list->enemies = counting_enemies(list->array);
+	list->enemy_pos = array_of_enemies(*list,0);
+	if(!list->enemy_pos)
+		return ;
+	list->flag = 0;
+	displaying_img(*list);
+	while (list->array[i])
+		free(list->array[i++]);
+	free(list->array);
+	while (list->collectibles_pos[i])
+		i++;
+	ft_frees(list->collectibles_pos, i);
 	i = 0;
-	// while (list.array[i])
-	// {
-	// 	printf("%s\n", list.array[i++]);
-	// }
-	// char url[] = "https://www.youtube.com/watch?v=w99vz_wj1S0";
-	// char command[1024];
-    // sprintf(command, "open \"%s\"", url);
-    // system(command);
-    // return 0;
-	// int **arr;
-	// int **list_of_collectibles = array_of_collectibles(list);
-	//printf("%d", list.enemies);
-	list.collectibles_pos = array_of_collectibles(list);
-	list.enemy_pos = array_of_enemies(list,0);
-	// while(list.enemy_pos[i])
-	// {
-	// 	printf("(%d %d)\n", list.enemy_pos[i][0],list.enemy_pos[i][1]);
-	// 	i++;
-	// }
-	displaying_img(list);
-	// printf("%d", t[0]);
-	// printf("%d", t[1]);
+	while (list->enemy_pos[i])
+		i++;
+	ft_frees(list->enemy_pos, i);
 	
-	// t = searching_for_collectibles(list);
-	//printf("%d",t);
 	
-	//printf("hello");
+
+}
+int checking_ber_extension(int ac, char *av)
+{
+	int fd;
+	int len;
+	if (ac > 2)
+	{
+		perror("More arguments than expected");
+		exit(1);
+	}
+	fd = open(av, O_RDWR, 0777);
+	if (fd == -1)
+	{
+		write(1,"No such file\n", 13);
+		exit(1); 
+	}
+	len = ft_strlen(av);
+	if (av[len-1] != 'r' && av[len-2] != 'e' && av[len-3] != 'b' && av[len-4] != '.' && av[0] != '.')
+	{
+		write(1,"File with extension unexpected\n",31);
+		exit(1);
+	}
+	return fd;
+}
+int checking_files_permissions()
+{
+	if (open("1_water.xpm",O_RDONLY,077) == -1 || open("2_water.xpm",O_RDONLY,077) == -1 || open("3_water.xpm",O_RDONLY,077) == -1)
+		return(write(1,"Permission denied or file deleted\n",35),exit(1),0);
+	if (open("castle.xpm",O_RDONLY,077) == -1 || open("enemy.xpm",O_RDONLY,077) == -1 || open("floor.xpm",O_RDONLY,077) == -1)
+		return(write(1,"Permission denied or file deleted\n",35),exit(1),0);
+	if (open("sky.xpm",O_RDONLY,077) == -1 || open("trees.xpm",O_RDONLY,077) == -1 || open("water.xpm",O_RDONLY,077) == -1)
+		return(write(1,"Permission denied or file deleted\n",35),exit(1),0);
+	if (open("Y.xpm",O_RDONLY,077) == -1 || open("O.xpm",O_RDONLY,077) == -1 || open("U.xpm",O_RDONLY,077) == -1)
+		return(write(1,"Permission denied or file deleted\n",35),exit(1),0);
+	if (open("S.xpm",O_RDONLY,077) == -1 || open("C.xpm",O_RDONLY,077) == -1 || open("K.xpm",O_RDONLY,077) == -1)
+		return(write(1,"Permission denied or file deleted\n",35),exit(1),0);
+	if (open("player2_.xpm",O_RDONLY,077) == -1 || open("soil.xpm",O_RDONLY,077) == -1)
+		return(write(1,"Permission denied or file deleted\n",35),exit(1),0);
+	return 0;
+}
+int main(int ac, char *av[])
+{
+	t_list list;
+	char *buffer;
+	char *joined;
+	int fd;
+	
+	fd = checking_ber_extension(ac, av[1]);
+	checking_files_permissions();
+	joined = get_next_line(fd);
+	error_joined(joined);
+	list.columns = ft_strlen(joined) - 1;
+	list.rows = 1;
+	checking_first_wall(joined);
+	joined = filling_the_map(fd, buffer, joined, &list);
+ 	main_bonus_util(&list, joined);
 }
