@@ -1,13 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   so_long_bonus_util3.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: souledla <souledla@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/30 06:07:49 by souledla          #+#    #+#             */
+/*   Updated: 2023/03/30 06:10:19 by souledla         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "so_long.h"
 #include "get_next_line.h"
-int **array_of_collectibles(t_list list)
+
+int	**array_of_collectibles(t_list list)
 {
-	int i;
-	int x;
-	int **list_of_collectibles;
-	int *array;
-	
-	x = 0;	
+	int	i;
+	int	x;
+	int	**list_of_collectibles;
+	int	*array;
+
+	x = 0;
 	i = 0;
 	list_of_collectibles = calloc(sizeof(int *), list.coin + 1);
 	list_of_collectibles[list.coin + 1] = 0;
@@ -16,48 +29,51 @@ int **array_of_collectibles(t_list list)
 	array = searching_for_collectibles(list, 0);
 	while (1)
 	{
-		if(array[0] == -1)
-			break;
+		if (array[0] == -1)
+			break ;
 		list_of_collectibles[x][0] = array[0];
 		list_of_collectibles[x][1] = array[1];
 		free(array);
-		array = searching_for_collectibles(list,4);
+		array = searching_for_collectibles(list, 4);
 		x++;
 	}
 	free(array);
-	return list_of_collectibles;
+	return (list_of_collectibles);
 }
-int *whiling_over_array_for_collectibles(t_list list, int *x, int *y ,int *array)
+
+int	*whiling_over_array_for_collectibles(t_list list, int *x,
+	int *y, int *array)
 {
 	while (list.array[*x])
 	{
-		while(list.array[*x][*y])
+		while (list.array[*x][*y])
 		{
 			if (list.array[*x][*y] == 'C')
 			{
 				array[0] = *x;
 				array[1] = *y;
 				(*y)++;
-				return array;
+				return (array);
 			}
 			(*y)++;
 		}
 		*y = 0;
 		(*x)++;
 	}
-	if ((*x)-1 == list.rows)
+	if ((*x) - 1 == list.rows)
 	{
 		array[0] = -1;
 		array[1] = -1;
-		return array;
+		return (array);
 	}
-	return 0;
+	return (0);
 }
-int *searching_for_collectibles(t_list list, int flag)
+
+int	*searching_for_collectibles(t_list list, int flag)
 {
-	int *array;
-	static int x;
- 	static int y;
+	static int	x;
+	static int	y;
+	int			*array;
 
 	if (flag == 0)
 	{
@@ -65,8 +81,8 @@ int *searching_for_collectibles(t_list list, int flag)
 		y = 0;
 	}
 	array = calloc(sizeof(int), 2);
-	array = whiling_over_array_for_collectibles(list,  &x, &y, array);
+	array = whiling_over_array_for_collectibles(list, &x, &y, array);
 	if (array != 0)
 		return (array);
-	return 0;
+	return (0);
 }

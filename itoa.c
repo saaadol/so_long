@@ -1,5 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   itoa.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: souledla <souledla@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/30 08:15:21 by souledla          #+#    #+#             */
+/*   Updated: 2023/03/30 08:15:38 by souledla         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "so_long.h"
 #include "get_next_line.h"
+
 static int	len_counter(long c)
 {
 	int	counter;
@@ -60,7 +73,7 @@ char	*ft_itoa(int c1)
 	long	c;
 
 	c = c1;
-	x = NULL ;
+	x = NULL;
 	flag = 0;
 	if (c < 0)
 	{
